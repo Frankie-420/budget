@@ -1,21 +1,39 @@
+from loan import Loan
+from income import Income
+from expenses import Expenses
 
-'''
-noi = Net Operating Income
-'''
-class property():
-    def __init__(self):
-        pass
+class Property:
+    def __init__(self,property_name:str) -> None:
+        self.property_name = property_name
+        self.address = None
+        self.property_price = 200_000
+        self.income:Income = self._read_income_data()
+        self.expenses:Expenses = self._read_expense_data()
+        self.loan:Loan = self._read_loan_data()
+    
+    def _read_loan_data(self) -> Loan:
+        loan = Loan(self.property_name)
+        return loan
 
-    def get_net_operating_income(self,gross_income:float,total_expense:float) -> float:
-        'Net operating income is the income excluding all costs that are not re-invested'
-        return gross_income - total_expense
-    def get_cap_rate(self,noi:float,property_value:float):
-        'The higher the cap rate the better'
-        return (noi / self.property_value) * 100
-    def get_dept_service_ratio(self,noi:float,dept_service:float):
-        '''dept service is the total amount of dept we are paying including,
-        principle + intrest + etc.'''
-        return (noi / dept_service)
-    def get_return_on_investment(net_profit:float,cost_of_investment:float):
-        '''this in essence is a the return we recieve for the amount of money we put in'''
-        return(net_profit / cost_of_investment) * 100
+    def _read_expense_data(self) -> Expenses:
+        expense = Expenses(self.property_name)
+        return expense
+
+    def _read_income_data(self) -> Income:
+        income = Income(self.property_name)
+        return income
+
+    def total_cash_invested(self) -> float:
+        return self.expenses.total_expenses() + self.loan.total_loan_payment() - self.income.total_income()
+
+    def gross_rental_yield(self) -> float:
+        return round((self.income.average_annual_income() / self.property_price) * 100,2)
+    
+    def average_annual_cash_flow(self) -> float:
+        return self.income.average_annual_income() - (self.expenses.average_annual_expenses() + self.loan.average_annual_loan_payment())
+    
+    def cash_on_cash_return(self) -> float:
+        return round(self.average_annual_cash_flow()/ self.total_cash_invested(),2)*100
+    
+    def operating_expense_ratio(self) -> float:
+        return round((self.expenses.total_operating_expenses() / self.income.total_income()) * 100,2)
